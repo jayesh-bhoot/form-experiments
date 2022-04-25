@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "module": "ES6",
+    "strict": true,
+    "moduleResolution": "Node",
+    "noEmitOnError": true
+  }
+}
