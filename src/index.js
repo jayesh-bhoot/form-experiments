@@ -13,7 +13,7 @@ import { div, form, input, label, p, text } from '@hyperapp/html';
 import { app } from 'hyperapp';
 function fillName(state, event) {
     if (event.target instanceof HTMLInputElement) {
-        return __assign(__assign({}, state), { name: event.target.value });
+        return __assign(__assign({}, state), { form: __assign(__assign({}, state.form), { inputs: __assign(__assign({}, state.form.inputs), { name: event.target.value }) }) });
     }
     else {
         return state;
@@ -21,7 +21,7 @@ function fillName(state, event) {
 }
 function fillAge(state, event) {
     if (event.target instanceof HTMLInputElement) {
-        return __assign(__assign({}, state), { age: event.target.value });
+        return __assign(__assign({}, state), { form: __assign(__assign({}, state.form), { inputs: __assign(__assign({}, state.form.inputs), { age: event.target.value }) }) });
     }
     else {
         return state;
@@ -31,23 +31,32 @@ function view(state) {
     return form({}, [
         label({}, [
             text('Name'),
-            input({ type: 'text', value: state.name, onchange: fillName }, []),
+            input({ type: 'text', value: state.form.inputs.name, onchange: fillName }, []),
         ]),
         label({}, [
             text('Age'),
-            input({ type: 'text', value: state.age, onchange: fillAge }, []),
+            input({ type: 'text', value: state.form.inputs.age, onchange: fillAge }, []),
         ]),
         div({}, [
-            p({}, [text("Name: ".concat(state.name))]),
-            p({}, [text("Age: ".concat(state.age))]),
-        ])
+            p({}, [text("Name: ".concat(state.form.inputs.name))]),
+            p({}, [text("Age: ".concat(state.form.inputs.age))]),
+        ]),
     ]);
 }
 var initialState = {
-    name: '',
-    age: ''
+    form: {
+        inputs: {
+            name: '',
+            email: '',
+            gender: '',
+            age: '',
+            pincode: '',
+            city: '',
+            company: ''
+        }
+    }
 };
-function initialize(node) {
+function initApp(node) {
     app({
         init: initialState,
         view: view,
@@ -57,7 +66,7 @@ function initialize(node) {
 window.addEventListener('DOMContentLoaded', function (event) {
     var root = document.getElementById('root');
     if (root) {
-        initialize(root);
+        initApp(root);
     }
     else {
         throw Error('Failed to find root element.');
