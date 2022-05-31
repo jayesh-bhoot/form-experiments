@@ -1,18 +1,17 @@
 import {div, form, input, label, p, text} from '@hyperapp/html';
 import {app, ElementVNode} from 'hyperapp';
 
-type FormSection =
-    | 'PersonalInfo'
-    | 'PropertyInfo'
-
 type Inputs = {
     name: string,
+    email: string,
+    gender: string,
     age: string,
-    address: string,
+    pincode: string,
+    city: string,
+    company: string
 }
 
 type Form = {
-    fillingSection: FormSection,
     inputs: Inputs,
 }
 
@@ -24,7 +23,13 @@ function fillName (state: State, event: Event): State {
     if (event.target instanceof HTMLInputElement) {
         return {
             ...state,
-            name: event.target.value,
+            form: {
+                ...state.form,
+                inputs: {
+                    ...state.form.inputs,
+                    name: event.target.value,
+                },
+            },
         };
     } else {
         return state;
@@ -35,7 +40,13 @@ function fillAge (state: State, event: Event): State {
     if (event.target instanceof HTMLInputElement) {
         return {
             ...state,
-            age: event.target.value,
+            form: {
+                ...state.form,
+                inputs: {
+                    ...state.form.inputs,
+                    age: event.target.value,
+                },
+            },
         };
     } else {
         return state;
@@ -46,31 +57,34 @@ function view (state: State): ElementVNode<State> {
     return form({}, [
         label({}, [
             text('Name'),
-            input({type: 'text', value: state.name, onchange: fillName}, []),
+            input({type: 'text', value: state.form.inputs.name, onchange: fillName}, []),
         ]),
         label({}, [
             text('Age'),
-            input({type: 'text', value: state.age, onchange: fillAge}, []),
+            input({type: 'text', value: state.form.inputs.age, onchange: fillAge}, []),
         ]),
         div({}, [
-            p({}, [text(`Name: ${state.name}`)]),
-            p({}, [text(`Age: ${state.age}`)]),
+            p({}, [text(`Name: ${state.form.inputs.name}`)]),
+            p({}, [text(`Age: ${state.form.inputs.age}`)]),
         ]),
     ]);
 }
 
 const initialState: State = {
     form: {
-        fillingSection: 'PersonalInfo',
         inputs: {
             name: '',
+            email: '',
+            gender: '',
             age: '',
-            address: '',
+            pincode: '',
+            city: '',
+            company: '',
         },
-    }
+    },
 };
 
-function initialize (node: HTMLElement) {
+function initApp (node: HTMLElement) {
     app({
         init: initialState,
         view: view,
@@ -81,7 +95,7 @@ function initialize (node: HTMLElement) {
 window.addEventListener('DOMContentLoaded', (event) => {
     const root = document.getElementById('root');
     if (root) {
-        initialize(root);
+        initApp(root);
     } else {
         throw Error('Failed to find root element.');
     }
