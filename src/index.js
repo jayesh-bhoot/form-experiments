@@ -11,9 +11,21 @@ var __assign = (this && this.__assign) || function () {
 };
 import { div, form, input, label, p, text } from '@hyperapp/html';
 import { app } from 'hyperapp';
+var emptyField = function () { return ({ state: 'Untouched', value: '' }); };
+var error = function (field, error) {
+    if (field.state === 'Untouched') {
+        return '';
+    }
+    else {
+        return error;
+    }
+};
 function fillName(state, event) {
     if (event.target instanceof HTMLInputElement) {
-        return __assign(__assign({}, state), { form: __assign(__assign({}, state.form), { inputs: __assign(__assign({}, state.form.inputs), { name: event.target.value }) }) });
+        return __assign(__assign({}, state), { form: __assign(__assign({}, state.form), { fields: __assign(__assign({}, state.form.fields), { name: {
+                        state: 'Touched',
+                        value: event.target.value
+                    } }) }) });
     }
     else {
         return state;
@@ -21,7 +33,10 @@ function fillName(state, event) {
 }
 function fillAge(state, event) {
     if (event.target instanceof HTMLInputElement) {
-        return __assign(__assign({}, state), { form: __assign(__assign({}, state.form), { inputs: __assign(__assign({}, state.form.inputs), { age: event.target.value }) }) });
+        return __assign(__assign({}, state), { form: __assign(__assign({}, state.form), { fields: __assign(__assign({}, state.form.fields), { age: {
+                        state: 'Touched',
+                        value: event.target.value
+                    } }) }) });
     }
     else {
         return state;
@@ -31,28 +46,28 @@ function view(state) {
     return form({}, [
         label({}, [
             text('Name'),
-            input({ type: 'text', value: state.form.inputs.name, onchange: fillName }, []),
+            input({ type: 'text', value: state.form.fields.name.value, onchange: fillName }, []),
         ]),
         label({}, [
             text('Age'),
-            input({ type: 'text', value: state.form.inputs.age, onchange: fillAge }, []),
+            input({ type: 'text', value: state.form.fields.age.value, onchange: fillAge }, []),
         ]),
         div({}, [
-            p({}, [text("Name: ".concat(state.form.inputs.name))]),
-            p({}, [text("Age: ".concat(state.form.inputs.age))]),
+            p({}, [text("Name: ".concat(state.form.fields.name.value))]),
+            p({}, [text("Age: ".concat(state.form.fields.age.value))]),
         ]),
     ]);
 }
 var initialState = {
     form: {
-        inputs: {
-            name: '',
-            email: '',
-            gender: '',
-            age: '',
-            pincode: '',
-            city: '',
-            company: ''
+        fields: {
+            name: emptyField(),
+            email: emptyField(),
+            gender: emptyField(),
+            age: emptyField(),
+            pincode: emptyField(),
+            city: emptyField(),
+            company: emptyField()
         }
     }
 };

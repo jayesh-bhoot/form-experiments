@@ -1,22 +1,68 @@
 import {div, form, input, label, p, text} from '@hyperapp/html';
 import {app, ElementVNode} from 'hyperapp';
 
-type Inputs = {
+type InputField =
+    | { state: 'Untouched', value: '' }
+    | { state: 'Touched', value: string }
+
+const emptyField = (): InputField => ({state: 'Untouched', value: ''});
+
+type Fields = {
+    name: InputField,
+    email: InputField,
+    age: InputField,
+    height: InputField,
+    pincode: InputField,
+    city: InputField,
+    company: InputField
+}
+
+type Person = {
     name: string,
     email: string,
-    gender: string,
-    age: string,
+    age: number,
+    height: number,
     pincode: string,
     city: string,
     company: string
 }
 
+type Result<T, E> =
+    | { state: 'Ok', value: T }
+    | { state: 'Error', error: E }
+
+const toPerson = (fields: Fields) => {
+    const toName = (input: string): Result<string, string> => {
+        if (input && input.trim().length >= 0) {
+            return {
+                state: 'Ok',
+                value: input.trim(),
+            };
+        } else {
+            return {
+                state: 'Error',
+                error: 'Please fill your name.'
+            }
+        }
+    };
+
+    if (toName(fields.name))
+};
+
+const error = (field: InputField, error: string) => {
+    if (field.state === 'Untouched') {
+        return '';
+    } else {
+        return error;
+    }
+};
+
 type Form = {
-    inputs: Inputs,
+    fields: Fields,
 }
 
 type State = {
-    form: Form
+    form: Form,
 }
 
 function fillName (state: State, event: Event): State {
@@ -25,9 +71,12 @@ function fillName (state: State, event: Event): State {
             ...state,
             form: {
                 ...state.form,
-                inputs: {
-                    ...state.form.inputs,
-                    name: event.target.value,
+                fields: {
+                    ...state.form.fields,
+                    name: {
+                        state: 'Touched',
+                        value: event.target.value,
+                    },
                 },
             },
         };
@@ -42,9 +91,12 @@ function fillAge (state: State, event: Event): State {
             ...state,
             form: {
                 ...state.form,
-                inputs: {
-                    ...state.form.inputs,
-                    age: event.target.value,
+                fields: {
+                    ...state.form.fields,
+                    age: {
+                        state: 'Touched',
+                        value: event.target.value,
+                    },
                 },
             },
         };
@@ -57,29 +109,29 @@ function view (state: State): ElementVNode<State> {
     return form({}, [
         label({}, [
             text('Name'),
-            input({type: 'text', value: state.form.inputs.name, onchange: fillName}, []),
+            input({type: 'text', value: state.form.fields.name.value, onchange: fillName}, []),
         ]),
         label({}, [
             text('Age'),
-            input({type: 'text', value: state.form.inputs.age, onchange: fillAge}, []),
+            input({type: 'text', value: state.form.fields.age.value, onchange: fillAge}, []),
         ]),
         div({}, [
-            p({}, [text(`Name: ${state.form.inputs.name}`)]),
-            p({}, [text(`Age: ${state.form.inputs.age}`)]),
+            p({}, [text(`Name: ${state.form.fields.name.value}`)]),
+            p({}, [text(`Age: ${state.form.fields.age.value}`)]),
         ]),
     ]);
 }
 
 const initialState: State = {
     form: {
-        inputs: {
-            name: '',
-            email: '',
-            gender: '',
-            age: '',
-            pincode: '',
-            city: '',
-            company: '',
+        fields: {
+            name: emptyField(),
+            email: emptyField(),
+            age: emptyField(),
+            height: emptyField(),
+            pincode: emptyField(),
+            city: emptyField(),
+            company: emptyField(),
         },
     },
 };
