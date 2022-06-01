@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ls src/*.js | entr -c esbuild src/index.js --bundle --outdir=build && cp src/index.html build/index.html",
+    "start": "ls src/*.js | entr -sc 'esbuild src/index.js --bundle --outdir=build && cp src/index.html build/index.html'",
     "ts:start": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
