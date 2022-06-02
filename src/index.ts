@@ -46,7 +46,7 @@ const toPerson = (fields: Fields) => {
         }
     };
 
-    if (toName(fields.name))
+    // if (toName(fields.name))
 };
 
 const error = (field: InputField, error: string) => {
