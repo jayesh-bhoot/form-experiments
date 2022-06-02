@@ -17,6 +17,18 @@ type Fields = {
     company: InputField
 }
 
+const AllSections = [
+    'Social',
+    'Physiological',
+    'Geographical',
+    'Financial',
+] as const;
+type Section = typeof AllSections[number];
+
+const FieldsOrder = [
+
+]
+
 type Person = {
     name: string,
     email: string,
@@ -41,8 +53,8 @@ const toPerson = (fields: Fields) => {
         } else {
             return {
                 state: 'Error',
-                error: 'Please fill your name.'
-            }
+                error: 'Please fill your name.',
+            };
         }
     };
 
