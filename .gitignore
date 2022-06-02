@@ -1,1 +1,3 @@
 build
+# Ignore js files because they are generated artifacts from tsc.
+src/*.js
