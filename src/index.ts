@@ -1,22 +1,33 @@
 import {div, form, input, label, p, text} from '@hyperapp/html';
 import {app, ElementVNode} from 'hyperapp';
 
-type InputField =
-    | { state: 'Untouched', value: '' }
-    | { state: 'Touched', value: string }
+type Result<T, E> =
+    | { state: 'Ok', value: T }
+    | { state: 'Error', error: E }
 
-const emptyField = (): InputField => ({state: 'Untouched', value: ''});
-
+type FormState =
+    | 'Filling'
+    | 'Fixing'
+    | 'Submitting'
+    | 'Submitted'
 type Fields = {
-    name: InputField,
-    email: InputField,
-    age: InputField,
-    height: InputField,
-    pincode: InputField,
-    city: InputField,
-    company: InputField
+    name: string,
+    email: string,
+    age: string,
+    height: string,
+    pincode: string,
+    city: string,
+    company: string
 }
-
+type FieldErrors = {
+    name: string,
+    email: string,
+    age: string,
+    height: string,
+    pincode: string,
+    city: string,
+    company: string,
+}
 const AllSections = [
     'Social',
     'Physiological',
@@ -24,10 +35,16 @@ const AllSections = [
     'Financial',
 ] as const;
 type Section = typeof AllSections[number];
+const nextSection = (currentSection: Section): Section => {
 
-const FieldsOrder = [
-
-]
+}
+type Form = {
+    state: FormState,
+    fields: Fields,
+    fieldErrors: FieldErrors,
+    formErrors: string[],
+    currentSection: Section,
+}
 
 type Person = {
     name: string,
@@ -38,11 +55,6 @@ type Person = {
     city: string,
     company: string
 }
-
-type Result<T, E> =
-    | { state: 'Ok', value: T }
-    | { state: 'Error', error: E }
-
 const toPerson = (fields: Fields) => {
     const toName = (input: string): Result<string, string> => {
         if (input && input.trim().length >= 0) {
@@ -61,23 +73,11 @@ const toPerson = (fields: Fields) => {
     // if (toName(fields.name))
 };
 
-const error = (field: InputField, error: string) => {
-    if (field.state === 'Untouched') {
-        return '';
-    } else {
-        return error;
-    }
-};
-
-type Form = {
-    fields: Fields,
-}
-
-type State = {
+type AppState = {
     form: Form,
 }
 
-function fillName (state: State, event: Event): State {
+function fillName (state: AppState, event: Event): AppState {
     if (event.target instanceof HTMLInputElement) {
         return {
             ...state,
@@ -85,10 +85,7 @@ function fillName (state: State, event: Event): State {
                 ...state.form,
                 fields: {
                     ...state.form.fields,
-                    name: {
-                        state: 'Touched',
-                        value: event.target.value,
-                    },
+                    name: event.target.value,
                 },
             },
         };
@@ -97,7 +94,7 @@ function fillName (state: State, event: Event): State {
     }
 }
 
-function fillAge (state: State, event: Event): State {
+function fillAge (state: AppState, event: Event): AppState {
     if (event.target instanceof HTMLInputElement) {
         return {
             ...state,
@@ -105,10 +102,7 @@ function fillAge (state: State, event: Event): State {
                 ...state.form,
                 fields: {
                     ...state.form.fields,
-                    age: {
-                        state: 'Touched',
-                        value: event.target.value,
-                    },
+                    age: event.target.value,
                 },
             },
         };
@@ -117,34 +111,45 @@ function fillAge (state: State, event: Event): State {
     }
 }
 
-function view (state: State): ElementVNode<State> {
+function view (state: AppState): ElementVNode<AppState> {
     return form({}, [
         label({}, [
             text('Name'),
-            input({type: 'text', value: state.form.fields.name.value, onchange: fillName}, []),
+            input({type: 'text', value: state.form.fields.name, onchange: fillName}, []),
         ]),
         label({}, [
             text('Age'),
-            input({type: 'text', value: state.form.fields.age.value, onchange: fillAge}, []),
+            input({type: 'text', value: state.form.fields.age, onchange: fillAge}, []),
         ]),
         div({}, [
-            p({}, [text(`Name: ${state.form.fields.name.value}`)]),
-            p({}, [text(`Age: ${state.form.fields.age.value}`)]),
+            p({}, [text(`Name: ${state.form.fields.name}`)]),
+            p({}, [text(`Age: ${state.form.fields.age}`)]),
         ]),
     ]);
 }
 
-const initialState: State = {
+const initialState: AppState = {
     form: {
+        state: 'Filling',
         fields: {
-            name: emptyField(),
-            email: emptyField(),
-            age: emptyField(),
-            height: emptyField(),
-            pincode: emptyField(),
-            city: emptyField(),
-            company: emptyField(),
+            name: '',
+            email: '',
+            age: '',
+            height: '',
+            pincode: '',
+            city: '',
+            company: '',
         },
+        fieldErrors: {
+            name: '',
+            email: '',
+            age: '',
+            height: '',
+            pincode: '',
+            city: '',
+            company: '',
+        },
+        formErrors: [],
     },
 };
 
