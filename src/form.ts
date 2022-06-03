@@ -34,11 +34,6 @@ export type Fields = {
     company: string
 }
 
-type FieldFilled = {
-    name: FieldName,
-    value: string,
-}
-
 export type FieldErrors = {
     name: string,
     email: string,
@@ -61,7 +56,7 @@ export function firstSection (): Section {
     return 'Social';
 }
 
-export function nextSection (currentSection: Section): Section | undefined {
+export function nextSection (currentSection: Section): Section {
     switch (currentSection) {
         case 'Social':
             return 'Physiological';
@@ -73,14 +68,14 @@ export function nextSection (currentSection: Section): Section | undefined {
             return 'Financial';
 
         case 'Financial':
-            return undefined;
+            return 'Financial';
     }
 }
 
-export function previousSection (currentSection: Section): Section | undefined {
+export function previousSection (currentSection: Section): Section {
     switch (currentSection) {
         case 'Social':
-            return undefined;
+            return 'Social';
 
         case 'Physiological':
             return 'Social';
@@ -90,6 +85,41 @@ export function previousSection (currentSection: Section): Section | undefined {
 
         case 'Financial':
             return 'Geographical';
+    }
+}
+
+function errorsUntilCurrentSection (section: Section, errors: FieldErrors): FieldErrors {
+    switch (section) {
+        case 'Social': {
+            return {
+                ...errors,
+                age: '',
+                height: '',
+                pincode: '',
+                city: '',
+                company: '',
+            };
+        }
+
+        case 'Physiological': {
+            return {
+                ...errors,
+                pincode: '',
+                city: '',
+                company: '',
+            };
+        }
+
+        case 'Geographical': {
+            return {
+                ...errors,
+                company: '',
+            };
+        }
+
+        case 'Financial': {
+            return errors;
+        }
     }
 }
 
@@ -108,6 +138,41 @@ export function fillField (state: AppState, event: Event): AppState {
         };
     } else {
         return state;
+    }
+}
+
+export function continue_ (state: AppState, event: SubmitEvent): Dispatchable<AppState> {
+    const result = toPerson(state.form.fields);
+    if (isOk(result)) {
+        return [
+            {
+                ...state,
+                form: {
+                    ...state.form,
+                    state: 'Filling',
+                    currentSection: nextSection(state.form.currentSection),
+                    fieldErrors: initialState.form.fieldErrors,
+                    formErrors: initialState.form.formErrors,
+                },
+            },
+            () => event.preventDefault(),
+        ];
+    } else {
+        const errors = errorsUntilCurrentSection(state.form.currentSection, result.error);
+        const hasErrors = Object.entries(errors).some(([k, v]) => v && v.length > 0);
+        return [
+            {
+                ...state,
+                form: {
+                    ...state.form,
+                    state: hasErrors ? 'Fixing' : 'Filling',
+                    currentSection: hasErrors ? state.form.currentSection : nextSection(state.form.currentSection),
+                    fieldErrors: errors,
+                    formErrors: hasErrors ? ['Please fix all the errors below'] : [],
+                },
+            },
+            () => event.preventDefault(),
+        ];
     }
 }
 
@@ -133,7 +198,7 @@ export function submit (state: AppState, event: SubmitEvent): Dispatchable<AppSt
                 form: {
                     ...state.form,
                     state: 'Fixing',
-                    fieldErrors: result.error,
+                    fieldErrors: errorsUntilCurrentSection(state.form.currentSection, result.error),
                     formErrors: ['Please fix all the errors below'],
                 },
             },
