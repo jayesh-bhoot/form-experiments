@@ -1,4 +1,4 @@
-import {button, div, form, input, label, li, p, span, text, ul} from '@hyperapp/html';
+import {button, div, fieldset, form, input, label, li, p, span, text, ul} from '@hyperapp/html';
 import {Dispatchable, ElementVNode} from 'hyperapp';
 import {AppState, initialState} from './app';
 import {toPerson} from './person';
@@ -242,9 +242,8 @@ export function submit (state: AppState, event: SubmitEvent): Dispatchable<AppSt
     }
 }
 
-export function viewForm (formState: Form): ElementVNode<AppState> {
-    return form({onsubmit: submit}, [
-        ul({}, formState.formErrors.map(error => li({}, text(error)))),
+function viewSocialSection (formState: Form): ElementVNode<AppState> {
+    return fieldset({}, [
         div({'class': 'FillName'}, [
             label({'for': 'name', 'class': 'FillName-Label'}, [
                 span({}, text('Name')),
@@ -257,20 +256,72 @@ export function viewForm (formState: Form): ElementVNode<AppState> {
                 span({}, text('Email')),
                 span({}, text(formState.fieldErrors.email)),
             ]),
-            input({type: 'text', name: 'email', id: 'email', value: formState.fields.email, onchange: fillField}, []),
+            input({
+                type: 'text',
+                name: 'email',
+                id: 'email',
+                value: formState.fields.email,
+                onchange: fillField,
+            }, []),
         ]),
-        // div({'class': 'FillAge'}, [
-        //     label({'for': 'age', 'class': 'FillAge-Label'}, [
-        //         span({}, text('Age')),
-        //         span({}, text(formState.fieldErrors.age)),
-        //     ]),
-        //     input({type: 'text', name: 'age', id: 'age', value: formState.fields.age, onchange: fillField}, []),
-        // ]),
+    ]);
+}
+
+function viewPhysiologicalSection (formState: Form): ElementVNode<AppState> {
+    return fieldset({}, [
+        div({'class': 'FillAge'}, [
+            label({'for': 'age', 'class': 'FillAge-Label'}, [
+                span({}, text('Age')),
+                span({}, text(formState.fieldErrors.age)),
+            ]),
+            input({type: 'text', name: 'age', id: 'age', value: formState.fields.age, onchange: fillField}, []),
+        ]),
+        div({'class': 'FillHeight'}, [
+            label({'for': 'height', 'class': 'FillHeight-Label'}, [
+                span({}, text('Height in cms')),
+                span({}, text(formState.fieldErrors.height)),
+            ]),
+            input({
+                type: 'text',
+                name: 'height',
+                id: 'height',
+                value: formState.fields.height,
+                onchange: fillField,
+            }, []),
+        ]),
+    ]);
+}
+
+
+function viewSection (formState: Form): ElementVNode<AppState> {
+    switch (formState.currentSection) {
+        case 'Social':
+            return viewSocialSection(formState);
+
+        case 'Physiological':
+            return viewPhysiologicalSection(formState);
+
+        case 'Geographical':
+            return p({}, [text('Address')]);
+
+        case 'Financial':
+            return p({}, [text('Company')]);
+    }
+}
+
+function viewSummary (formState: Form): ElementVNode<AppState> {
+    return div({}, [
+        p({}, [text(`Name: ${formState.fields.name}`)]),
+        p({}, [text(`Email: ${formState.fields.email}`)]),
+        p({}, [text(`Age: ${formState.fields.age}`)]),
+        p({}, [text(`Age: ${formState.fields.height}`)]),
+    ]);
+}
+
+export function viewForm (formState: Form): ElementVNode<AppState> {
+    return form({onsubmit: continue_}, [
+        ul({}, formState.formErrors.map(error => li({}, text(error)))),
+        viewSection(formState),
         button({type: 'submit'}, [text('Continue')]),
-        div({}, [
-            p({}, [text(`Name: ${formState.fields.name}`)]),
-            p({}, [text(`Email: ${formState.fields.email}`)]),
-            // p({}, [text(`Age: ${formState.fields.age}`)]),
-        ]),
     ]);
 }
