@@ -1,0 +1,28 @@
+:root {
+    font-size: 16px;
+}
+
+input[type='text'] {
+    border: 1px solid black;
+    height: 20px;
+    margin: 0;
+}
+
+input[type='text']:focus {
+    outline: 2px solid green;
+}
+
+.FillName,
+.FillAge,
+.FillEmail {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.FillName-Label,
+.FillEmail-Label,
+.FillAge-Label {
+    display: flex;
+    flex-direction: column;
+}

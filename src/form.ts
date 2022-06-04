@@ -1,4 +1,5 @@
-import {Dispatchable} from 'hyperapp';
+import {button, div, form, input, label, li, p, span, text, ul} from '@hyperapp/html';
+import {Dispatchable, ElementVNode} from 'hyperapp';
 import {AppState, initialState} from './app';
 import {toPerson} from './person';
 import {isOk} from './result';
@@ -88,7 +89,7 @@ export function previousSection (currentSection: Section): Section {
     }
 }
 
-function errorsUntilCurrentSection (section: Section, errors: FieldErrors): FieldErrors {
+function getErrorsUntilCurrentSection (section: Section, errors: FieldErrors): FieldErrors {
     switch (section) {
         case 'Social': {
             return {
@@ -125,6 +126,40 @@ function errorsUntilCurrentSection (section: Section, errors: FieldErrors): Fiel
 
 export function fillField (state: AppState, event: Event): AppState {
     if (event.target instanceof HTMLInputElement) {
+        const fields: Fields = {
+            ...state.form.fields,
+            // todo: how to make this verify that FieldName and Fields.property must match?
+            [event.target.name]: event.target.value,
+        };
+        if (state.form.state === 'Fixing') {
+            const result = toPerson(fields);
+            if (isOk(result)) {
+                return {
+                    ...state,
+                    form: {
+                        ...state.form,
+                        state: 'Filling',
+                        fields,
+                        fieldErrors: initialState.form.fieldErrors,
+                        formErrors: initialState.form.formErrors,
+                    },
+                };
+            } else {
+                const errors = getErrorsUntilCurrentSection(state.form.currentSection, result.error);
+                const hasErrors = Object.entries(errors).some(([k, v]) => v && v.length > 0);
+                return {
+                    ...state,
+                    form: {
+                        ...state.form,
+                        state: hasErrors ? 'Fixing' : 'Filling',
+                        fields,
+                        fieldErrors: errors,
+                        formErrors: hasErrors ? ['Please fix all the errors below'] : [],
+                    },
+                };
+            }
+        }
+
         return {
             ...state,
             form: {
@@ -158,7 +193,7 @@ export function continue_ (state: AppState, event: SubmitEvent): Dispatchable<Ap
             () => event.preventDefault(),
         ];
     } else {
-        const errors = errorsUntilCurrentSection(state.form.currentSection, result.error);
+        const errors = getErrorsUntilCurrentSection(state.form.currentSection, result.error);
         const hasErrors = Object.entries(errors).some(([k, v]) => v && v.length > 0);
         return [
             {
@@ -198,11 +233,44 @@ export function submit (state: AppState, event: SubmitEvent): Dispatchable<AppSt
                 form: {
                     ...state.form,
                     state: 'Fixing',
-                    fieldErrors: errorsUntilCurrentSection(state.form.currentSection, result.error),
+                    fieldErrors: getErrorsUntilCurrentSection(state.form.currentSection, result.error),
                     formErrors: ['Please fix all the errors below'],
                 },
             },
             () => event.preventDefault(),
         ];
     }
+}
+
+export function viewForm (formState: Form): ElementVNode<AppState> {
+    return form({onsubmit: submit}, [
+        ul({}, formState.formErrors.map(error => li({}, text(error)))),
+        div({'class': 'FillName'}, [
+            label({'for': 'name', 'class': 'FillName-Label'}, [
+                span({}, text('Name')),
+                span({}, text(formState.fieldErrors.name)),
+            ]),
+            input({type: 'text', name: 'name', id: 'name', value: formState.fields.name, onchange: fillField}, []),
+        ]),
+        div({'class': 'FillEmail'}, [
+            label({'for': 'email', 'class': 'FillEmail-Label'}, [
+                span({}, text('Email')),
+                span({}, text(formState.fieldErrors.email)),
+            ]),
+            input({type: 'text', name: 'email', id: 'email', value: formState.fields.email, onchange: fillField}, []),
+        ]),
+        // div({'class': 'FillAge'}, [
+        //     label({'for': 'age', 'class': 'FillAge-Label'}, [
+        //         span({}, text('Age')),
+        //         span({}, text(formState.fieldErrors.age)),
+        //     ]),
+        //     input({type: 'text', name: 'age', id: 'age', value: formState.fields.age, onchange: fillField}, []),
+        // ]),
+        button({type: 'submit'}, [text('Continue')]),
+        div({}, [
+            p({}, [text(`Name: ${formState.fields.name}`)]),
+            p({}, [text(`Email: ${formState.fields.email}`)]),
+            // p({}, [text(`Age: ${formState.fields.age}`)]),
+        ]),
+    ]);
 }

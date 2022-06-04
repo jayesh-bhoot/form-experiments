@@ -15,7 +15,7 @@ function toName (input: string): Result<string, string> {
     if (input && input.trim().length >= 0) {
         return ok(input.trim());
     } else {
-        return error('Please fill your name.');
+        return error('Please fill your name');
     }
 }
 
@@ -23,38 +23,37 @@ function toEmail (input: string): Result<string, string> {
     if (input && input.trim().length >= 0) {
         return ok(input.trim());
     } else {
-        return error('Please fill your email.');
+        return error('Please fill your email');
     }
 }
 
 function toAge (input: string): Result<number, string> {
     if (!(input && input.trim().length >= 0)) {
-        return error('Please fill your age.');
+        return error('Please fill your age');
     }
-
     const age = Number(input.trim());
     if (!Number.isFinite(age)) {
-        return error('Please enter a number as your age.');
+        return error('Please enter a number as your age');
     }
 
     if (!(age >= 18 && age <= 150)) {
-        return error('You are not an adult.');
+        return error('You are not an adult');
     }
     return ok(age);
 }
 
 function toHeight (input: string): Result<number, string> {
     if (!(input && input.trim().length >= 0)) {
-        return error('Please fill your height in cms.');
+        return error('Please fill your height in cms');
     }
 
     const height = Number(input.trim());
     if (!Number.isFinite(height)) {
-        return error('Please enter a number as your height in cms.');
+        return error('Please enter a number as your height in cms');
     }
 
     if (!(height >= 40 && height <= 300)) {
-        return error('You are not a human.');
+        return error('You are not a human');
     }
 
     return ok(height);
@@ -64,7 +63,7 @@ function toPincode (input: string): Result<string, string> {
     if (input && input.trim().length >= 0) {
         return ok(input.trim());
     } else {
-        return error('Please fill your pincode.');
+        return error('Please fill your pincode');
     }
 }
 
@@ -72,7 +71,7 @@ function toCity (input: string): Result<string, string> {
     if (input && input.trim().length >= 0) {
         return ok(input.trim());
     } else {
-        return error('Please fill your city.');
+        return error('Please fill your city');
     }
 }
 
@@ -80,7 +79,7 @@ function toCompany (input: string): Result<string, string> {
     if (input && input.trim().length >= 0) {
         return ok(input.trim());
     } else {
-        return error('Please fill your company.');
+        return error('Please fill your company');
     }
 }
 
