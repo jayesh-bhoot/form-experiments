@@ -292,6 +292,54 @@ function viewPhysiologicalSection (formState: Form): ElementVNode<AppState> {
     ]);
 }
 
+function viewGeographicalSection (formState: Form): ElementVNode<AppState> {
+    return fieldset({}, [
+        div({'class': 'FillPincode'}, [
+            label({'for': 'pincode', 'class': 'FillPincode-Label'}, [
+                span({}, text('Pincode')),
+                span({}, text(formState.fieldErrors.pincode)),
+            ]),
+            input({
+                type: 'text',
+                name: 'pincode',
+                id: 'pincode',
+                value: formState.fields.pincode,
+                onchange: fillField,
+            }, []),
+        ]),
+        div({'class': 'FillCity'}, [
+            label({'for': 'city', 'class': 'FillCity-Label'}, [
+                span({}, text('City')),
+                span({}, text(formState.fieldErrors.city)),
+            ]),
+            input({
+                type: 'text',
+                name: 'city',
+                id: 'city',
+                value: formState.fields.city,
+                onchange: fillField,
+            }, []),
+        ]),
+    ]);
+}
+
+function viewFinancialSection (formState: Form): ElementVNode<AppState> {
+    return fieldset({}, [
+        div({'class': 'FillCompany'}, [
+            label({'for': 'company', 'class': 'FillCompany-Label'}, [
+                span({}, text('Company')),
+                span({}, text(formState.fieldErrors.company)),
+            ]),
+            input({
+                type: 'text',
+                name: 'company',
+                id: 'company',
+                value: formState.fields.company,
+                onchange: fillField,
+            }, []),
+        ]),
+    ]);
+}
 
 function viewSection (formState: Form): ElementVNode<AppState> {
     switch (formState.currentSection) {
@@ -302,10 +350,10 @@ function viewSection (formState: Form): ElementVNode<AppState> {
             return viewPhysiologicalSection(formState);
 
         case 'Geographical':
-            return p({}, [text('Address')]);
+            return viewGeographicalSection(formState);
 
         case 'Financial':
-            return p({}, [text('Company')]);
+            return viewFinancialSection(formState);
     }
 }
 
