@@ -1,5 +1,7 @@
 import {h1, section, text} from '@hyperapp/html';
+import classNames from 'classnames';
 import {app, ElementVNode} from 'hyperapp';
+
 import {firstSection, Form, viewForm} from './form';
 
 export type AppState = {
@@ -8,7 +10,7 @@ export type AppState = {
 
 export function view (state: AppState): ElementVNode<AppState> {
     return section({}, [
-        h1({class: 'PageTitle'}, [text("Make a person")]),
+        h1({class: classNames('PageTitle')}, [text('Make a person')]),
         viewForm(state.form)]);
 }
 
