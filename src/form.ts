@@ -14,7 +14,8 @@ export type Section =
     | 'Social'
     | 'Physiological'
     | 'Geographical'
-    | 'Financial';
+    | 'Financial'
+    | 'Review';
 
 export type FieldName =
     | 'name'
@@ -69,7 +70,10 @@ export function nextSection (currentSection: Section): Section {
             return 'Financial';
 
         case 'Financial':
-            return 'Financial';
+            return 'Review';
+
+        case 'Review':
+            return 'Review';
     }
 }
 
@@ -86,6 +90,9 @@ export function previousSection (currentSection: Section): Section {
 
         case 'Financial':
             return 'Geographical';
+
+        case 'Review':
+            return 'Financial';
     }
 }
 
@@ -119,6 +126,10 @@ function getErrorsUntilCurrentSection (section: Section, errors: FieldErrors): F
         }
 
         case 'Financial': {
+            return errors;
+        }
+
+        case 'Review': {
             return errors;
         }
     }
@@ -176,7 +187,7 @@ export function fillField (state: AppState, event: Event): AppState {
     }
 }
 
-export function continue_ (state: AppState, event: SubmitEvent): Dispatchable<AppState> {
+export function submitSection (state: AppState, event: SubmitEvent): Dispatchable<AppState> {
     const result = toPerson(state.form.fields);
     if (isOk(result)) {
         return [
@@ -242,8 +253,13 @@ export function submit (state: AppState, event: SubmitEvent): Dispatchable<AppSt
     }
 }
 
+function viewErrorPanel (formState: Form): ElementVNode<AppState> {
+    return ul({'class': 'ErrorPanel'}, formState.formErrors.map(error => li({}, text(error))));
+}
+
 function viewSocialSection (formState: Form): ElementVNode<AppState> {
-    return fieldset({}, [
+    return form({onsubmit: submitSection, 'class': 'PersonForm'}, [
+        viewErrorPanel(formState),
         div({'class': 'FillName'}, [
             label({'for': 'name', 'class': 'FillName-Label'}, [
                 span({}, text('Name')),
@@ -264,11 +280,13 @@ function viewSocialSection (formState: Form): ElementVNode<AppState> {
                 onchange: fillField,
             }, []),
         ]),
+        button({type: 'submit'}, [text('Continue')]),
     ]);
 }
 
 function viewPhysiologicalSection (formState: Form): ElementVNode<AppState> {
-    return fieldset({}, [
+    return form({onsubmit: submitSection, 'class': 'PersonForm'}, [
+        viewErrorPanel(formState),
         div({'class': 'FillAge'}, [
             label({'for': 'age', 'class': 'FillAge-Label'}, [
                 span({}, text('Age')),
@@ -289,11 +307,13 @@ function viewPhysiologicalSection (formState: Form): ElementVNode<AppState> {
                 onchange: fillField,
             }, []),
         ]),
+        button({type: 'submit'}, [text('Continue')]),
     ]);
 }
 
 function viewGeographicalSection (formState: Form): ElementVNode<AppState> {
-    return fieldset({}, [
+    return form({onsubmit: submitSection, 'class': 'PersonForm'}, [
+        viewErrorPanel(formState),
         div({'class': 'FillPincode'}, [
             label({'for': 'pincode', 'class': 'FillPincode-Label'}, [
                 span({}, text('Pincode')),
@@ -320,11 +340,13 @@ function viewGeographicalSection (formState: Form): ElementVNode<AppState> {
                 onchange: fillField,
             }, []),
         ]),
+        button({type: 'submit'}, [text('Continue')]),
     ]);
 }
 
 function viewFinancialSection (formState: Form): ElementVNode<AppState> {
-    return fieldset({}, [
+    return form({onsubmit: submitSection, 'class': 'PersonForm'}, [
+        viewErrorPanel(formState),
         div({'class': 'FillCompany'}, [
             label({'for': 'company', 'class': 'FillCompany-Label'}, [
                 span({}, text('Company')),
@@ -338,10 +360,24 @@ function viewFinancialSection (formState: Form): ElementVNode<AppState> {
                 onchange: fillField,
             }, []),
         ]),
+        button({type: 'submit'}, [text('Continue')]),
     ]);
 }
 
-function viewSection (formState: Form): ElementVNode<AppState> {
+function viewReview (formState: Form): ElementVNode<AppState> {
+    return form({onsubmit: submit, 'class': 'PersonForm'}, [
+        viewErrorPanel(formState),
+        div({}, [
+            p({}, [text(`Name: ${formState.fields.name}`)]),
+            p({}, [text(`Email: ${formState.fields.email}`)]),
+            p({}, [text(`Age: ${formState.fields.age}`)]),
+            p({}, [text(`Age: ${formState.fields.height}`)]),
+        ]),
+        button({type: 'submit'}, [text('Continue')]),
+    ]);
+}
+
+export function viewForm (formState: Form): ElementVNode<AppState> {
     switch (formState.currentSection) {
         case 'Social':
             return viewSocialSection(formState);
@@ -354,22 +390,8 @@ function viewSection (formState: Form): ElementVNode<AppState> {
 
         case 'Financial':
             return viewFinancialSection(formState);
+
+        case 'Review':
+            return viewReview(formState);
     }
-}
-
-function viewSummary (formState: Form): ElementVNode<AppState> {
-    return div({}, [
-        p({}, [text(`Name: ${formState.fields.name}`)]),
-        p({}, [text(`Email: ${formState.fields.email}`)]),
-        p({}, [text(`Age: ${formState.fields.age}`)]),
-        p({}, [text(`Age: ${formState.fields.height}`)]),
-    ]);
-}
-
-export function viewForm (formState: Form): ElementVNode<AppState> {
-    return form({onsubmit: continue_}, [
-        ul({}, formState.formErrors.map(error => li({}, text(error)))),
-        viewSection(formState),
-        button({type: 'submit'}, [text('Continue')]),
-    ]);
 }
