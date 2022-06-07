@@ -8,7 +8,7 @@ export type AppState = {
 
 export function view (state: AppState): ElementVNode<AppState> {
     return section({}, [
-        h1({'class': 'PageTitle'}, [text("Make a person")]),
+        h1({class: 'PageTitle'}, [text("Make a person")]),
         viewForm(state.form)]);
 }
 
