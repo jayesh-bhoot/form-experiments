@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hyperapp/html": "^2.0.0",
+    "classnames": "^2.3.1",
     "hyperapp": "^2.0.22"
   }
 }
